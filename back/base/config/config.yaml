@@ -1,0 +1,29 @@
+# Server Configuration
+server:
+  port: 8888
+  name: "base-service"
+
+# JWT Configuration
+jwt:
+  secret_key: "your-secret-key"
+  expiration: 24h
+  issuer: "base-service"
+
+# GitHub OAuth Configuration
+github:
+  auth_url: "https://github.com/login/oauth/authorize"
+  token_url: "https://github.com/login/oauth/access_token"
+  user_info_url: "https://api.github.com/user"
+  client_id: "Ov23liJpeJFTSKTMijmZ"
+  client_secret: "7df5d917e928a909a4dca96a4b60d31f771b884f"
+  redirect_url: "http://localhost:9999/login"
+  authorization_header: "Authorization"
+  user_agent_header: "User-Agent"
+  user_agent_value: "CodeReaderApp"
+
+# Consul Configuration
+consul:
+  address: "consul:8500"
+  service_name: "base-service"
+  service_id: "base-1"
+  service_port: 8080

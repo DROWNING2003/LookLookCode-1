@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    ports:
+      - "9999:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - frontend-network
+    restart: always
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: lookcode
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d lookcode"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend-network
+    restart: always
+
+  consul:
+    image: consul:1.15
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    command: agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0
+    volumes:
+      - consul_data:/consul/data
+    networks:
+      - backend-network
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend-network
+    restart: always
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - backend-network
+    restart: always
+
+  hello-service:
+    build:
+      context: ./back/base
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    depends_on:
+      - consul
+    networks:
+      - backend-network
+    restart: always
+
+  api-gateway:
+    image: higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/all-in-one:latest
+    ports:
+      - "8443:8443"
+      - "8080:8080"
+      - "8001:8001"
+    environment:
+      CONSUL_SERVER: consul:8500
+    volumes:
+      - higress_certs:/etc/higress/certs
+    depends_on:
+      - consul
+    networks:
+      - frontend-network
+      - backend-network
+    restart: always
+
+networks:
+  frontend-network:
+  backend-network:
+
+volumes:
+  postgres_data:
+  consul_data:
+  redis_data:
+  minio_data:
+  higress_certs:
