@@ -1,6 +1,6 @@
 # Server Configuration
 server:
-  port: 8888
+  port: 8889
   name: "base-service"
 
 # JWT Configuration
@@ -23,7 +23,7 @@ github:
 
 # Consul Configuration
 consul:
-  address: "consul:8500"
+  address: "127.0.0.1:8500"
   service_name: "base-service"
   service_id: "base-1"
   service_port: 8080

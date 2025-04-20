@@ -3,12 +3,12 @@
     <!-- 遮罩层 -->
     <div
       v-show="modelValue"
-      class="fixed inset-0 bg-black/50 z-40"
+      class="fixed inset-0 bg-black/50 z-51"
       @click="$emit('update:modelValue', false)"
     ></div>
     <!-- 侧边栏 -->
     <div
-      class="fixed top-0 left-0 h-full w-80 bg-background-700 z-50 transform transition-transform duration-300 ease-in-out"
+      class="fixed top-0 left-0 h-full w-80 bg-background-700 z-52 transform transition-transform duration-300 ease-in-out"
       :class="modelValue ? 'translate-x-0' : '-translate-x-full'"
     >
       <!-- 侧边栏头部 -->

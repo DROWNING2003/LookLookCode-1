@@ -50,6 +50,7 @@ export interface Theme {
 export const useThemeStore = defineStore("theme", {
   persist: true,
   state: () => ({
+    VITE_BACK_URL: import.meta.env.VITE_BACK_URL || "http://localhost:3000",
     mode: "default" as ThemeMode, //当前主题
     theme: {
       default:<Theme>{
@@ -122,6 +123,10 @@ export const useThemeStore = defineStore("theme", {
       this.mode = "customer";
       this.theme.customer = theme;
       this.applyTheme();
+    },
+    // 设置后端地址
+    setBackendUrl(url: string) {
+      this.VITE_BACK_URL = url;
     },
   },
   getters: {},

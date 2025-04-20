@@ -37,22 +37,28 @@
 
     <!-- 底部版权信息 -->
     <div class="fixed bottom-4 w-full text-center z-10">
-      <p class="text-secondary text-sm font-mono">
+      <p class="text-secondary text-sm font-mono" @click="showEnvEditor = true">
         &copy; 2024 代码阅读. 保留所有权利
       </p>
     </div>
+    <EnvEditor :isOpen="showEnvEditor" @close="showEnvEditor = false"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useUserStore } from "../stores/user";
+import { useThemeStore } from "../stores/theme";
 import { getUserInfo } from "../api/user";
+import EnvEditor from "../components/EnvEditor.vue";
 
 const userStore = useUserStore();
+const themeStore = useThemeStore();
+const showEnvEditor = ref(false);
+
 
 const handleGithubLogin = () => {
-  window.location.href = import.meta.env.VITE_BACK_URL+"/api/auth/github";
+  window.location.href = themeStore.VITE_BACK_URL+"/api/auth/github";
 };
 
 const handleCallback = () => {
@@ -62,7 +68,7 @@ const handleCallback = () => {
 
   if (code) {
     fetch(
-      `${import.meta.env.VITE_BACK_URL}/api/auth/github/callback?code=${code}&state=${state}`
+      `${themeStore.VITE_BACK_URL}/api/auth/github/callback?code=${code}&state=${state}`
     )
       .then((response) => response.json())
       .then((data) => {

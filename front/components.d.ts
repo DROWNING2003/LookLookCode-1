@@ -8,15 +8,22 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Banner: typeof import('./src/components/Banner.vue')['default']
     BottomNavBar: typeof import('./src/components/BottomNavBar.vue')['default']
     CodeEdit: typeof import('./src/components/CodeEdit.vue')['default']
     DiscoverSkeletonLoader: typeof import('./src/components/DiscoverSkeletonLoader.vue')['default']
+    EnvEditor: typeof import('./src/components/EnvEditor.vue')['default']
     HomeSkeletonLoader: typeof import('./src/components/HomeSkeletonLoader.vue')['default']
+    PullToRefresh: typeof import('./src/components/PullToRefresh.vue')['default']
     RepoCard: typeof import('./src/components/RepoCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SideBar: typeof import('./src/components/SideBar.vue')['default']
     SkeletonLoader: typeof import('./src/components/SkeletonLoader.vue')['default']
     TopNavBar: typeof import('./src/components/TopNavBar.vue')['default']
+    VanButton: typeof import('vant/es')['Button']
+    VanDialog: typeof import('vant/es')['Dialog']
+    VanField: typeof import('vant/es')['Field']
+    VanPullRefresh: typeof import('vant/es')['PullRefresh']
   }
 }

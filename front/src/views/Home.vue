@@ -4,10 +4,14 @@
   >
   </background>
   <div class="continer">
-    <TopNavBar class="fixed top-0" :title="pageTitle" />
+    <TopNavBar @more="()=>{
+      // showToast('More clicked');
+    }" class="fixed top-0" :title="pageTitle" />
     <Suspense>
       <template #default>
-        <RouterView class="overflow-auto" />
+        <PullToRefresh :onRefresh="handleRefresh" class="h-full">
+          <RouterView class="overflow-auto" />
+        </PullToRefresh>
       </template>
       <template #fallback>
         <HomeSkeletonLoader />
@@ -22,8 +26,15 @@ import { useRoute } from 'vue-router';
 import TopNavBar from "../components/TopNavBar.vue";
 import BottomNavBar from "../components/BottomNavBar.vue";
 import HomeSkeletonLoader from "../components/HomeSkeletonLoader.vue";
+import PullToRefresh from "../components/PullToRefresh.vue";
 
 const route = useRoute();
+
+const handleRefresh = async () => {
+  // 在这里添加刷新逻辑
+  await new Promise(resolve => setTimeout(resolve, 1000));
+};
+
 const pageTitle = computed(() => {
   switch (route.path) {
     case '/':

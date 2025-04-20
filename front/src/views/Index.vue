@@ -1,178 +1,29 @@
-<!-- <!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>开源仓库</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#1a1a1a',
-                        secondary: '#2d2d2d'
-                    },
-                    borderRadius: {
-                        'none': '0px',
-                        'sm': '8px',
-                        DEFAULT: '12px',
-                        'md': '16px',
-                        'lg': '20px',
-                        'xl': '24px',
-                        '2xl': '28px',
-                        '3xl': '32px',
-                        'full': '9999px',
-                        'button': '12px'
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-        }
-        .glass-effect {
-            background: rgba(26, 26, 26, 0.8);
-            backdrop-filter: blur(12px);
-        }
-        .card-glass {
-            background: rgba(45, 45, 45, 0.7);
-            backdrop-filter: blur(8px);
-        }
-    </style>
-</head>
-<body class="min-h-screen">
-    <div class="relative w-[375px] mx-auto min-h-screen pb-[64px]">
-        <div class="fixed top-0 w-full z-50">
-            <div class="glass-effect px-4 py-3 flex items-center gap-3">
-                <button class="text-white">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-                <div class="flex-1 relative">
-                    <input type="text" placeholder="搜索仓库" class="w-full bg-[#2d2d2d] text-white px-4 py-2 !rounded-button text-sm border-none outline-none">
-                    <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                </div>
-                <button class="text-white">
-                    <i class="fas fa-ellipsis-v text-xl"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="relative h-[200px] overflow-hidden">
-            <img src="https://ai-public.mastergo.com/ai/img_res/1252829a77a67f4f395ee92e3dd72098.jpg" class="w-full h-full object-cover" alt="banner">
-            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[#121212]"></div>
-        </div>
-
-        <div class="px-4 mt-4">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-semibold">热门仓库</h2>
-                <button class="text-sm text-gray-400">
-                    <i class="fas fa-sort-amount-down mr-1"></i>
-                    排序
-                </button>
-            </div>
-
-            <div class="space-y-4">
-                <div class="card-glass p-4 !rounded-button">
-                    <div class="flex justify-between items-start">
-                        <h3 class="text-lg font-medium">Vue3-Admin-Template</h3>
-                        <div class="flex items-center">
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <span class="ml-1">328</span>
-                        </div>
-                    </div>
-                    <p class="text-sm text-gray-400 mt-2">基于 Vue3 + TypeScript 的后台管理系统模板</p>
-                    <div class="flex items-center mt-3 text-sm text-gray-500">
-                        <i class="fas fa-code-branch mr-1"></i>
-                        <span>42</span>
-                        <span class="mx-2">•</span>
-                        <span>2 天前更新</span>
-                    </div>
-                </div>
-
-                <div class="card-glass p-4 !rounded-button">
-                    <div class="flex justify-between items-start">
-                        <h3 class="text-lg font-medium">React-Native-Shop</h3>
-                        <div class="flex items-center">
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <span class="ml-1">156</span>
-                        </div>
-                    </div>
-                    <p class="text-sm text-gray-400 mt-2">跨平台电商 App 解决方案</p>
-                    <div class="flex items-center mt-3 text-sm text-gray-500">
-                        <i class="fas fa-code-branch mr-1"></i>
-                        <span>28</span>
-                        <span class="mx-2">•</span>
-                        <span>5 天前更新</span>
-                    </div>
-                </div>
-
-                <div class="card-glass p-4 !rounded-button">
-                    <div class="flex justify-between items-start">
-                        <h3 class="text-lg font-medium">Flutter-UI-Kit</h3>
-                        <div class="flex items-center">
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <span class="ml-1">89</span>
-                        </div>
-                    </div>
-                    <p class="text-sm text-gray-400 mt-2">精美的 Flutter UI 组件库</p>
-                    <div class="flex items-center mt-3 text-sm text-gray-500">
-                        <i class="fas fa-code-branch mr-1"></i>
-                        <span>15</span>
-                        <span class="mx-2">•</span>
-                        <span>1 周前更新</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <nav class="fixed bottom-0 w-full glass-effect">
-            <div class="grid grid-cols-5 py-2">
-                <a class="flex flex-col items-center text-white">
-                    <i class="fas fa-home text-xl mb-1"></i>
-                    <span class="text-xs">首页</span>
-                </a>
-                <a class="flex flex-col items-center text-gray-400">
-                    <i class="fas fa-compass text-xl mb-1"></i>
-                    <span class="text-xs">发现</span>
-                </a>
-                <a class="flex flex-col items-center text-gray-400">
-                    <i class="fas fa-plus-circle text-2xl"></i>
-                </a>
-                <a class="flex flex-col items-center text-gray-400">
-                    <i class="fas fa-bell text-xl mb-1"></i>
-                    <span class="text-xs">通知</span>
-                </a>
-                <a class="flex flex-col items-center text-gray-400">
-                    <i class="fas fa-user text-xl mb-1"></i>
-                    <span class="text-xs">我的</span>
-                </a>
-            </div>
-        </nav>
-    </div>
-</body>
-</html> -->
-
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-[#121212] to-[#1a1a1a] overflow-auto flex flex-col pt-16 pb-20 max-w-7xl mx-auto w-full">
+  <div class="min-h-screen bg-gradient-to-b from-[#121212] to-[#1a1a1a] overflow-auto flex flex-col pt-14 pb-20 max-w-7xl mx-auto w-full">
   
-      <!-- 标题和排序区域 -->
-      <div class="relative w-full h-[200px] overflow-hidden rounded-b-[32px] mb-8">
-        <img src="../../public/header.png" alt="" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#121212]/50 to-[#121212]">
-          <div class="absolute bottom-8 left-8">
-            <h1 class="text-3xl font-bold text-white mb-2">看看代码</h1>
-            <p class="text-gray-300">学习优秀的开源项目</p>
-          </div>
-        </div>
-      </div>
+      <!-- header&banner -->
+      <Banner :banners="[
+        {
+          image: '/header.png',
+          title: '看看代码',
+          description: '学习优秀的开源项目',
+          url: 'https://github.com'
+        },
+        {
+          image: '/default.jpg',
+          title: '看看代码2',
+          description: '学习优秀的开源项目',
+          url: 'http://localhost:8081/user'
+        },
+        {
+          image: '/vite.svg',
+          title: '广告位1',
+          description: '',
+          url: 'https://vitejs.dev'
+        },
+      ]" />
+
+      <!-- 最近仓库 -->
       <div class="flex items-center justify-between mb-8 px-4">
         <h2 class="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">最近仓库</h2>
         <div class="flex items-center gap-4">
@@ -205,6 +56,7 @@
 import { ref, onMounted, watch } from "vue";
 import Pagination from "../baseComponent/Pagination.vue";
 import RepoCard from '../components/RepoCard.vue';
+import Banner from '../components/Banner.vue';
 import {
   listUserRepositories,
   listUserStarredRepositories,

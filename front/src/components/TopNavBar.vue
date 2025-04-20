@@ -10,7 +10,7 @@
       <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--text-secondary)]"></i>
       <input
         type="text"
-        class="w-full h-10 pl-10 pr-4 bg-background-800/80 rounded-xl text-[var(--text-primary)] border-none focus:outline-none placeholder-[var(--text-secondary)]"
+        class="w-full h-10 pl-10 shadow-2xl pr-4 bg-background-900/90 rounded-2xl text-[var(--text-primary)] border-none focus:outline-none placeholder-[var(--text-secondary)]"
         placeholder="搜索仓库..."
         v-model="searchQuery"
         @input="$emit('search', searchQuery)"

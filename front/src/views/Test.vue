@@ -40,6 +40,7 @@
       <div class="bg-gray-700 p-4 rounded-lg">
         <h3 class="text-white font-medium mb-2">ai 回复：</h3>
         <div class="text-gray-300">
+          <!-- {{messages}} -->
           <div v-for="m in messages" :key="m.id">
             <div v-if="m.role != 'user'">
               <MdPreview id="preview-only" :modelValue="m.content" />
@@ -60,7 +61,7 @@ import "md-editor-v3/lib/preview.css";
 import { useChat } from "@ai-sdk/vue";
 
 const { messages, input, handleSubmit } = useChat({
-  api: "http://localhost:8080/api/chat",
+  api: "http://localhost:8889/api/chatOllama",
 });
 function aichat() {
   input.value = currentCode.value;

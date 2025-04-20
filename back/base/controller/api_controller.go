@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"base/internal"
+	"base/internal/sse"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -16,16 +18,78 @@ func NewApiController() *ApiController {
 	return &ApiController{}
 }
 
-type RequestBody struct {
-	ID       string `json:"id"`
-	Messages []struct {
-		Role    string `json:"role"`
-		Content string `json:"content"`
-		Parts   []struct {
-			Type string `json:"type"`
-			Text string `json:"text"`
-		} `json:"parts"`
-	} `json:"messages"`
+func (c *ApiController) Chat(ctx *gin.Context) {
+	var request internal.RequestBody
+	if err := ctx.BindJSON(&request); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse request body"})
+		return
+	}
+
+	if len(request.Messages) == 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No messages provided"})
+		return
+	}
+	if request.ID == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Missing request ID"})
+		return
+	}
+
+	// 创建SSE响应写入器
+	writer, err := sse.NewResponseWriter(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	chat, err := internal.NewChatService(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create chat service"})
+		return
+	}
+
+	lastMessage := request.Messages[len(request.Messages)-1]
+	response, err := chat.GetResponse(ctx, request.Messages, lastMessage.Content)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer response.Close()
+
+	// 发送初始消息
+	writer.SendStart(request.ID)
+
+	// 初始化usage统计
+	var usage struct {
+		PromptTokens     int `json:"promptTokens"`
+		CompletionTokens int `json:"completionTokens"`
+	}
+	usage.PromptTokens = len(request.Messages)
+
+	// 流式处理响应
+	for {
+		message, err := response.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get response"})
+			return
+		}
+
+		// 发送消息内容
+		writer.SendContent(message.Content)
+		usage.CompletionTokens++
+	}
+
+	// 发送结束消息
+	if err := writer.SendFinish(sse.Usage{
+		PromptTokens:     usage.PromptTokens,
+		CompletionTokens: usage.CompletionTokens,
+	}); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 }
 
 func (c *ApiController) ChatHandler(ctx *gin.Context) {
@@ -34,7 +98,7 @@ func (c *ApiController) ChatHandler(ctx *gin.Context) {
 		return
 	}
 
-	var request RequestBody
+	var request internal.RequestBody
 	if err := ctx.BindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse request body"})
 		return
@@ -74,7 +138,7 @@ func (c *ApiController) ChatHandler(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := http.Post("http://host.docker.internal:11434/api/generate", "application/json", bytes.NewBuffer(payloadBytes))
+	resp, err := http.Post("http://127.0.0.1:11434/api/generate", "application/json", bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to send request to Ollama: %v", err)})
 		return

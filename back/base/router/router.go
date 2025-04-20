@@ -44,6 +44,7 @@ func (r *Router) SetupRouter() *gin.Engine {
 	{
 		//大模型
 		apiGroup.POST("/chat", r.apiController.ChatHandler)
+		apiGroup.POST("/chatOllama", r.apiController.Chat)
 		// 认证相关路由
 		authGroup := apiGroup.Group("/auth")
 		{
