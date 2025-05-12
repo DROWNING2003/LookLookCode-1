@@ -76,6 +76,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8888:8888"
+    volumes:
+      - ./back/base/config:/app/config
     depends_on:
       - consul
     networks:

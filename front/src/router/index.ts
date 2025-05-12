@@ -24,9 +24,9 @@ const router = createRouter({
           component: Index
         },
         {
-          path: '/discover',
+          path: '/discover/:query?',
           name: 'discover',
-          component: () => import('../views/Discover.vue')
+          component: () => import('../views/Discover.vue'),
         },
         {
           path: '/notification',
@@ -35,7 +35,6 @@ const router = createRouter({
         },
       ]
     },
-
     {
       path: '/test',
       name: 'test',
@@ -50,6 +49,27 @@ const router = createRouter({
       path: '/repo/:owner/:repo',
       name: 'repository',
       component: () => import('../views/RepoView.vue')
+    },
+    
+    {
+      path: '/repo/:owner/:repo/commits/:branch', //Commits列表
+      name: 'repository-commits',
+      component: () => import('../views/Commits.vue')
+    },
+    // {
+    //   path: '/repo/:owner/:repo/commit/:branch', //具体的Commit
+    //   name: 'repository',
+    //   component: () => import('../views/RepoView.vue')
+    // },
+    {
+      path: '/repo/:owner/:repo/tree/:branch/:path*',
+      name: 'RepoTree',
+      component: () => import('../views/RepoTree.vue')
+    },
+    {
+      path: '/repo/:owner/:repo/blob/:path',
+      name: 'RepoBlob',
+      component: () => import('../views/RepoBlob.vue')
     },
     {
       path: '/login',

@@ -46,6 +46,12 @@ func (w *ResponseWriter) SendContent(content string) {
 	fmt.Fprintf(w.ctx.Writer, "0:%#v\n", content)
 	w.flusher.Flush()
 }
+func (w *ResponseWriter) SendError(msg string) error {
+	// Format error as SSE message
+	_, err := fmt.Fprintf(w.ctx.Writer, "event: error\ndata: %s\n\n", msg)
+	w.flusher.Flush()
+	return err
+}
 
 // Usage 用于统计token使用情况
 type Usage struct {

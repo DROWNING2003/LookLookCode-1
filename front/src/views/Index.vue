@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-[#121212] to-[#1a1a1a] overflow-auto flex flex-col pt-14 pb-20 max-w-7xl mx-auto w-full">
+  <div class="min-h-screen bg-gradient-to-b from-[#121212] to-[#1a1a1a] overflow-auto flex flex-col pt-14 pb-20 mx-auto w-screen">
   
       <!-- header&banner -->
       <Banner :banners="[
@@ -32,7 +32,7 @@
             <span>最近更新</span>
           </button>
         </div>
-      </div>
+      </div>  
 
       <!-- 仓库列表 -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
@@ -40,7 +40,7 @@
       </div>
 
       <!-- 分页组件 -->
-      <div class="flex justify-center mt-12 mb-8">
+      <div class="flex  justify-center mt-12 mb-8">
         <Pagination 
           v-if="total > 0" 
           v-model:currentPage="currentPage" 

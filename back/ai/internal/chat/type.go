@@ -1,4 +1,4 @@
-package controller
+package chat
 
 type ChatRequestBody struct {
 	ID      string `json:"id"`

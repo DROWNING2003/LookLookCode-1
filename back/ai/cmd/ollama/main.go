@@ -19,7 +19,7 @@ func main() {
 		return
 	}
 
-	messages := []chat.Message{}
+	messages := []chat.Messages{}
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
@@ -42,8 +42,8 @@ func main() {
 		}
 
 		messages = append(messages,
-			chat.Message{Role: "user", Content: userInput},
-			chat.Message{Role: "assistant", Content: response},
+			chat.Messages{Role: "user", Content: userInput},
+			chat.Messages{Role: "assistant", Content: response},
 		)
 		fmt.Println()
 	}

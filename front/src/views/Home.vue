@@ -4,7 +4,7 @@
   >
   </background>
   <div class="continer">
-    <TopNavBar @more="()=>{
+    <TopNavBar @search="handleSearch" @more="()=>{
       // showToast('More clicked');
     }" class="fixed top-0" :title="pageTitle" />
     <Suspense>
@@ -22,13 +22,20 @@
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import TopNavBar from "../components/TopNavBar.vue";
 import BottomNavBar from "../components/BottomNavBar.vue";
 import HomeSkeletonLoader from "../components/HomeSkeletonLoader.vue";
 import PullToRefresh from "../components/PullToRefresh.vue";
 
 const route = useRoute();
+const router = useRouter();
+
+const handleSearch = (query: string) => {
+  if (query.trim()) {
+    router.push(`/discover/${encodeURIComponent(query.trim())}`);
+  }
+};
 
 const handleRefresh = async () => {
   // 在这里添加刷新逻辑

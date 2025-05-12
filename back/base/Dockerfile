@@ -18,7 +18,6 @@ RUN GOOS=linux go build -o main .
 FROM alpine:latest
 WORKDIR /app
 COPY --from=0 /app/main .
-COPY --from=0 /app/config/config.yaml ./config/config.yaml
 # 暴露服务端口
 EXPOSE 8888
 

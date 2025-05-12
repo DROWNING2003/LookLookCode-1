@@ -95,8 +95,8 @@ func NewChatService(ctx context.Context) (*ChatService, error) {
 	}, nil
 }
 
-func (s *ChatService) GetResponse(ctx context.Context, messages []Message, userInput string) (string, error) {
-	messages = append(messages, Message{Role: "user", Content: userInput})
+func (s *ChatService) GetResponse(ctx context.Context, messages []Messages, userInput string) (string, error) {
+	messages = append(messages, Messages{Role: "user", Content: userInput})
 
 	// Prepare chat history
 	var chatHistory []*schema.Message

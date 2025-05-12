@@ -1,120 +1,54 @@
-<!--
- * @description 仓库详情页面组件
- * @features
- * - 显示仓库基本信息（名称、描述、统计数据等）
- * - 支持分支切换和文件浏览
- * - 集成文件图标系统
- * - 显示文件的最后提交信息
- * @dependencies
- * - Vue 3 Composition API
- * - Vue Router
- * - TailwindCSS
- * - Font Awesome 图标
- -->
 <template>
-  <div class="min-h-screen bg-primary text-primary">
-    <TopNavBar
-      :title="repository?.full_name || '仓库详情'"
-      @search="handleSearch"
-    />
+  <div
+    class="min-h-screen bg-gradient-to-b from-[#121212] to-[#1a1a1a] overflow-auto flex flex-col pt-14 pb-20 mx-auto w-screen"
+  >
     <!-- 主要内容区域 -->
-    <main class="pt-16 pb-20 px-4 max-w-7xl mx-auto w-full">
-      <!-- 加载状态 -->
-      <div v-if="loading" class="flex items-center justify-center py-12">
-        <div
-          class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"
-        ></div>
-      </div>
-      <!-- 错误提示 -->
-      <div v-else-if="error" class="text-red-500 text-center py-8">
-        {{ error }}
-      </div>
-      <!-- 仓库内容 -->
-      <template v-else>
-        <!-- 仓库信息部分保持不变 -->
-        <div class="mb-8" v-if="repository">
-          <div class="flex items-center gap-2 mb-2">
-            <i class="far fa-book text-gray-400"></i>
-            <h1 class="text-xl font-semibold text-blue-400">
-              {{ repository.full_name }}
-            </h1>
-          </div>
-          <p class="text-gray-400 mb-4">{{ repository.description }}</p>
-          <!-- 统计信息 -->
-          <div class="flex gap-6 mb-4">
-            <button class="flex items-center gap-1 hover:text-blue-400">
-              <i class="far fa-star"></i>
-              <span>{{ repository.stargazers_count }} Star</span>
-            </button>
-            <button class="flex items-center gap-1 hover:text-blue-400">
-              <i class="fas fa-code-branch"></i>
-              <span>{{ repository.forks_count }} Fork</span>
-            </button>
-            <button class="flex items-center gap-1 hover:text-blue-400">
-              <i class="far fa-eye"></i>
-              <span>{{ repository.watchers_count }} Watch</span>
-            </button>
-          </div>
-          <!-- 技术标签 -->
-          <div class="flex flex-wrap gap-2">
-            <span
-              v-if="repository.language"
-              class="px-2 py-1 text-sm bg-gray-700 rounded-full"
-              >{{ repository.language }}</span
-            >
-            <span
-              v-for="topic in repository.topics"
-              :key="topic"
-              class="px-2 py-1 text-sm bg-gray-700 rounded-full"
-              >{{ topic }}</span
-            >
-          </div>
-        </div>
-      </template>
-      <!-- 分支选择和文件列表 -->
-      <div class="mb-8">
-        <div class="flex items-center gap-4 mb-4 relative">
+    <main class="pt-8 pb-12 px-4 max-w-5xl mx-auto w-full">
+      <!-- 仓库信息部分 -->
+      <div class="mb-8" v-if="repository">
+        <div class="flex items-center gap-2 mb-2">
           <button
-            @click="showBranchDropdown = !showBranchDropdown"
-            class="flex items-center gap-2 bg-card px-3 py-2 rounded-lg hover:bg-card-hover transition-colors duration-200"
+            @click="router.back()"
+            class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
           >
-            <i class="fas fa-code-branch"></i>
-            <span>{{ currentBranch }}</span>
-            <i class="fas fa-chevron-down text-sm"></i>
+            <i class="text-gray-300 hover:text-white fas fa-arrow-left"></i>
           </button>
-          <div
-            v-if="showBranchDropdown"
-            class="absolute top-full left-0 mt-2 w-48 bg-card rounded-lg shadow-lg overflow-hidden z-50"
-          >
-            <button
-              v-for="branch in branches"
-              :key="branch.name"
-              @click="switchBranch(branch.name)"
-              class="w-full px-4 py-2 text-left hover:bg-card-hover transition-colors duration-200"
-            >
-              {{ branch.name }}
-            </button>
-          </div>
-          <a
-            v-if="repository"
-            :href="repository.html_url"
-            target="_blank"
-            class="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-lg transition-colors duration-200"
-          >
-            <i class="fas fa-book-open"></i>
-            <span>在 GitHub 上查看</span>
-          </a>
+          <h1 class="text-xl font-semibold text-blue-400">
+            {{ repository.full_name }}
+          </h1>
         </div>
-        <!-- 文件列表 -->
+        <p class="text-gray-400 mb-4">{{ repository.description }}</p>
+
+        <!-- 修改后的统计信息 -->
+        <div class="flex gap-6 mb-4">
+          <div class="flex items-center gap-1 text-gray-300">
+            <i class="far fa-star"></i>
+            <span>{{ repository.stargazers_count / 1000 }}k</span>
+          </div>
+          <div class="flex items-center gap-1 text-gray-300">
+            <i class="fas fa-code-branch"></i>
+            <span>{{ repository.forks_count }}</span>
+          </div>
+          <div class="flex items-center gap-1 text-gray-300">
+            <i class="far fa-eye"></i>
+            <span>{{ repository.watchers_count }}</span>
+          </div>
+        </div>
+        <!-- 分支切换 -->
+        <div class="flex items-center gap-2 mb-4">
+          <BranchSelect
+            @update:modelValue="(value:Branch)=>{
+              currentBranch = value;
+              fetchRepoData();
+            }"
+            v-model="currentBranch"
+            :branches="branches"
+          />
+        </div>
+        <!-- 文件列表部分 -->
         <div class="bg-card rounded-lg overflow-hidden">
-          <div v-if="currentPath" class="border-b border-gray-700">
-            <button
-              @click="goToParentDirectory"
-              class="flex items-center gap-3 px-4 py-3 hover:bg-card-hover w-full text-left"
-            >
-              <i class="fas fa-arrow-left text-gray-400"></i>
-              <span>返回上级目录</span>
-            </button>
+          <div class="px-4 py-2 border-b border-gray-700 bg-gray-800">
+            <span class="text-sm text-gray-400">代码</span>
           </div>
           <div
             v-for="file in files"
@@ -122,7 +56,7 @@
             class="border-b border-gray-700 last:border-b-0"
           >
             <div
-              class="flex items-center justify-between px-4 py-3 hover:bg-card-hover cursor-pointer"
+              class="flex items-center justify-between px-4 py-3 hover:bg-card-hover"
               @click="navigateToFile(file)"
             >
               <div class="flex items-center gap-3 flex-1">
@@ -131,22 +65,31 @@
                   class="text-gray-400"
                 ></i>
                 <div class="min-w-0">
-                  <p class="text-sm font-medium truncate">{{ file.name }}</p>
-                  <p v-if="file.message" class="text-xs text-gray-400 truncate">
-                    {{ file.message }}
+                  <p class="text-sm font-medium text-gray-100">
+                    {{ file.name }}
                   </p>
+                  <p class="text-xs text-gray-400">{{ file.time }}</p>
                 </div>
               </div>
-              <span
-                v-if="file.time"
-                class="text-xs text-gray-400 flex-shrink-0"
-                >{{ formatDate(file.time) }}</span
-              >
+              <span class="text-xs text-gray-400">
+                <!-- {{ formatCompactDate(file.time) }} -->
+              </span>
             </div>
           </div>
         </div>
-        <!-- readme 预览 -->
-        <MdPreview id="preview-only" :modelValue="readme" />
+
+        <!-- README 部分 -->
+        <div class="mt-8 bg-card rounded-lg overflow-hidden">
+          <div class="px-4 py-2 border-b border-gray-700 bg-gray-800">
+            <span class="text-sm text-gray-400">README.md</span>
+          </div>
+          <MdPreview
+            class="p-4"
+            theme="dark"
+            id="preview-only"
+            :modelValue="readme"
+          />
+        </div>
       </div>
     </main>
   </div>
@@ -154,29 +97,29 @@
 
 <script lang="ts" setup>
 // Vue 核心功能导入
+import BranchSelect from "@/baseComponent/BranchSelect.vue";
 import { ref, watch, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { MdPreview} from 'md-editor-v3';
-import 'md-editor-v3/lib/preview.css';
-// 组件导入
-import TopNavBar from "../components/TopNavBar.vue";
-
+import { useRoute, useRouter } from "vue-router";
+import { MdPreview } from "md-editor-v3";
+import "md-editor-v3/lib/preview.css";
 // API 和类型定义导入
 import {
   getRepository,
+  getRepositoryCommits,
   getRepositoryReadme,
   getRepositoryBranches,
   getRepositoryContributors,
   getRepositoryContents,
-  getRepositoryCommits,
+  // getRepositoryCommits,
   type Repository,
   type Branch,
   type FileContent,
-  type Commit,
+  // type Commit,
 } from "../api/repo";
 
 // 路由参数获取
 const route = useRoute();
+const router = useRouter();
 const owner = route.params.owner as string;
 const repo = route.params.repo as string;
 
@@ -187,21 +130,21 @@ const currentPath = ref(""); // 当前浏览的文件路径
  * 处理搜索事件
  * @todo 实现仓库内容搜索功能
  */
-const handleSearch = () => {
-  console.log("Search triggered");
-};
+// const handleSearch = () => {
+//   console.log("Search triggered");
+// };
 
 // 仓库数据相关的响应式状态
 const repository = ref<Repository | null>(null); // 仓库基本信息
 const readme = ref(""); // 仓库 README 内容
 const branches = ref<Branch[]>([]); // 仓库分支列表
 const contributors = ref<number>(0); // 贡献者数量
-const currentBranch = ref("main"); // 当前选中的分支
+const currentBranch = ref<Branch>(); // 当前选中的分支
 const files = ref<FileContent[]>([]); // 当前目录下的文件列表
-const commits = ref<Commit[]>([]); // 提交历史
+// const commits = ref<Commit[]>([]); // 提交历史
 
 // UI 状态控制
-const showBranchDropdown = ref(false); // 分支下拉菜单显示状态
+// const showBranchDropdown = ref(false); // 分支下拉菜单显示状态
 const loading = ref(true); // 加载状态
 const error = ref<string | null>(null); // 错误信息
 
@@ -212,34 +155,38 @@ const error = ref<string | null>(null); // 错误信息
 const fetchRepoData = async () => {
   loading.value = true;
   error.value = null;
+  //先获取分支
+  getRepositoryBranches(owner, repo)
+  .then((response) => {
+    branches.value = response.data;
+    currentBranch.value = branches.value.find(branch => branch.name === "main"||branch.name === "master") || branches.value[0];
+  })
   try {
     const [
       repoData,
       readmeContent,
-      branchesData,
       contributorsData,
       contentsData,
-      commitsData,
+      // commitsData,
     ] = await Promise.all([
       getRepository(owner, repo),
       getRepositoryReadme(owner, repo),
-      getRepositoryBranches(owner, repo),
+    
       getRepositoryContributors(owner, repo),
       getRepositoryContents(
         owner,
         repo,
         currentPath.value,
-        currentBranch.value
+        currentBranch.value?.name
       ),
-      getRepositoryCommits(owner, repo, {
-        per_page: 10,
-        sha: currentBranch.value,
-      }),
+      // getRepositoryCommits(owner, repo, {
+      //   per_page: 10,
+      //   sha: currentBranch.value,
+      // }),
     ]);
 
     repository.value = repoData.data;
     readme.value = readmeContent;
-    branches.value = branchesData.data;
     contributors.value = contributorsData.data.length;
 
     // 为每个文件添加最后一次提交信息
@@ -250,12 +197,13 @@ const fetchRepoData = async () => {
               const fileCommits = await getRepositoryCommits(owner, repo, {
                 per_page: 1,
                 path: file.path,
-                sha: currentBranch.value,
+                sha: currentBranch.value?.name,
               });
               if (fileCommits.data.length > 0) {
                 const lastCommit = fileCommits.data[0];
                 return {
                   ...file,
+                  checked: file.name === "build.gradle",
                   message: lastCommit.commit.message,
                   time: lastCommit.commit.author.date,
                 };
@@ -270,7 +218,7 @@ const fetchRepoData = async () => {
       : [];
 
     files.value = filesWithCommitInfo;
-    commits.value = commitsData.data;
+    // commits.value = commitsData.data;
   } catch (error) {
     console.error("Error fetching repository data:", error);
     // error.value = "获取仓库数据失败，请稍后重试" as string;
@@ -284,33 +232,41 @@ const fetchRepoData = async () => {
  * @param file 选中的文件或目录
  */
 const navigateToFile = (file: FileContent) => {
-  console.log('文件详情:', file);
+  console.log("文件详情:", file);
   // 如果是文件，获取文件内容
-  if (file.type === 'file') {
-    getRepositoryContents(owner, repo, file.path as string, currentBranch.value)
-      .then((response) => {
-        const content = response.data;
-        console.log('文件内容:', content);
-      })
-      .catch((err) => {
-        console.error('获取文件内容失败:', err);
-        error.value = '获取文件内容失败，请稍后重试';
-      });
+  if (file.type === "file") {
+    // getRepositoryContents(owner, repo, file.path as string, currentBranch.value)
+    //   .then((response) => {
+    //     const content = response.data;
+    //     console.log("文件内容:", content);
+    //   })
+    //   .catch((err) => {
+    //     console.error("获取文件内容失败:", err);
+    //     error.value = "获取文件内容失败，请稍后重试";
+    //   });
   }
   if (file.type === "dir") {
     // 如果是目录，更新当前路径并重新获取内容
-    currentPath.value = file.path as string;
-    getRepositoryContents(owner, repo, currentPath.value, currentBranch.value)
-      .then((response) => {
-        files.value = Array.isArray(response.data) ? response.data : [response.data];
-      })
-      .catch((err) => {
-        console.error("Error fetching directory contents:", err);
-        error.value = "获取目录内容失败，请稍后重试";
-      });
+    router.push({
+      name: "RepoTree",
+      params: { owner, repo, branch: currentBranch.value?.name, path: file.path },
+      force: true,
+    });
+    // currentPath.value = file.path as string;
+    // console.log(currentPath.value);
+
+    // getRepositoryContents(owner, repo, currentPath.value, currentBranch.value)
+    //   .then((response) => {
+    //     files.value = Array.isArray(response.data)
+    //       ? response.data
+    //       : [response.data];
+    //   })
+    //   .catch((err) => {
+    //     console.error("Error fetching directory contents:", err);
+    //     error.value = "获取目录内容失败，请稍后重试";
+    //   });
   } else {
     // 获取文件内容
-   
   }
 };
 
@@ -318,48 +274,46 @@ const navigateToFile = (file: FileContent) => {
  * 返回上级目录
  * 通过分割当前路径并移除最后一个部分来实现
  */
-const goToParentDirectory = () => {
-  if (currentPath.value) {
-    const parentPath = currentPath.value.split("/").slice(0, -1).join("/");
-    currentPath.value = parentPath;
-    getRepositoryContents(owner, repo, parentPath, currentBranch.value)
-      .then((response) => {
-        files.value = Array.isArray(response.data) ? response.data : [response.data];
-      })
-      .catch((err) => {
-        console.error("Error fetching parent directory contents:", err);
-        error.value = "获取目录内容失败，请稍后重试";
-      });
-  }
-};
+// const goToParentDirectory = () => {
+//   if (currentPath.value) {
+//     const parentPath = currentPath.value.split("/").slice(0, -1).join("/");
+//     currentPath.value = parentPath;
+//     getRepositoryContents(owner, repo, parentPath, currentBranch.value)
+//       .then((response) => {
+//         files.value = Array.isArray(response.data)
+//           ? response.data
+//           : [response.data];
+//       })
+//       .catch((err) => {
+//         console.error("Error fetching parent directory contents:", err);
+//         error.value = "获取目录内容失败，请稍后重试";
+//       });
+//   }
+// };
 /**
  * 切换分支
  * @param branchName 目标分支名称
  */
-const switchBranch = async (branchName: string) => {
-  currentBranch.value = branchName;
-  showBranchDropdown.value = false;
-  await fetchRepoData();
-};
+// const switchBranch = async (branchName: string) => {
+//   currentBranch.value = branchName;
+//   showBranchDropdown.value = false;
+//   await fetchRepoData();
+// };
 
 /**
- * 格式化日期为相对时间
- * @param dateString ISO 格式的日期字符串
- * @returns 格式化后的相对时间描述
+ * 紧凑时间格式化（匹配图片显示）
  */
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+// const formatCompactDate = (dateString: string) => {
+//   const date = new Date(dateString);
+//   const now = new Date();
+//   const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
 
-  if (days === 0) return "今天";
-  if (days === 1) return "昨天";
-  if (days < 7) return `${days}天前`;
-  if (days < 30) return `${Math.floor(days / 7)}周前`;
-  if (days < 365) return `${Math.floor(days / 30)}月前`;
-  return `${Math.floor(days / 365)}年前`;
-};
+//   if (diffDays === 0) return "今天";
+//   if (diffDays === 1) return "昨天";
+//   if (diffDays < 7) return `${diffDays}天前`;
+//   if (diffDays < 30) return `${Math.floor(diffDays / 7)}周前`;
+//   return `${Math.floor(diffDays / 30)}月前`;
+// };
 
 /**
  * 根据文件类型和名称获取对应的图标类名
@@ -436,7 +390,7 @@ const getFileIcon = (type: string, name: string) => {
   }
 };
 
-watch(() => currentBranch.value, fetchRepoData);
+// watch(() => currentBranch.value, fetchRepoData);
 
 onMounted(() => {
   fetchRepoData();
@@ -462,5 +416,15 @@ input:focus {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
+}
+
+/* 添加复选框样式 */
+.form-checkbox {
+  border-color: #4b5563;
+  background-color: #1f2937;
+}
+.form-checkbox:checked {
+  border-color: #3b82f6;
+  background-color: #3b82f6;
 }
 </style>

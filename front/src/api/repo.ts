@@ -1,5 +1,6 @@
 import githubInstance from "./user";
-
+import {GetInstance} from "./user";
+import { Base64 } from 'js-base64';
 // 仓库信息接口定义
 export interface Repository {
   id: number;
@@ -225,7 +226,24 @@ export const getRepositoryReadme = (owner: string, repo: string) => {
     .then(response => {
       // GitHub API 返回的是 Base64 编码的内容
       // 使用 atob 进行 base64 解码，这是浏览器原生支持的方法
-      return atob(response.data.content);
+      return Base64.decode(response.data.content);
+    });
+};
+
+/**
+ * 获取仓库的 README 内容
+ * @param owner 仓库所有者
+ * @param repo 仓库名称
+ * @example
+ * // 获取仓库的 README 内容
+ * const readme = await getRepositoryReadme('octocat', 'Hello-World');
+ */
+export const getRepositoryReadmeDir = (owner: string, repo: string,dir:string) => {
+  return githubInstance.get<{ content: string }>(`/repos/${owner}/${repo}/readme/${dir}`)
+    .then(response => {
+      // GitHub API 返回的是 Base64 编码的内容
+      // 使用 atob 进行 base64 解码，这是浏览器原生支持的方法
+      return Base64.decode(response.data.content);
     });
 };
 
@@ -306,5 +324,71 @@ export const getRepositoryFileContent = (owner: string, repo: string, path: stri
       };
     }
     return response.data;
+  });
+};
+
+/**
+ * 获取仓库文件内容
+ * @param owner 仓库所有者
+ * @param repo 仓库名称
+ * @param branch 分支
+ * @param ref 分支或提交的引用
+ * @example
+ * // 获取指定文件的内容
+ * const fileContent = await getRepositoryFileContent('octocat', 'Hello-World', 'README.md', 'main');
+ */
+export const getRepositoryFile= (owner: string, repo: string, branch: string, ref?: string) => {
+  return GetInstance.get(`/repos/${owner}/${repo}/blob/${branch}/${ref}`).then(response => {
+    response.data = response.data.payload
+    return response.data;
+  });
+};
+
+/**
+ * 获取仓库文件提交信息
+ * @param owner 仓库所有者
+ * @param repo 仓库名称
+ * @param branch 分支
+ * @param ref 分支或提交的引用
+ * @example
+ * // 获取指定文件的内容
+ * const fileContent = await getRepositoryFileContent('octocat', 'Hello-World', 'README.md', 'main');
+ */
+export const getDirectoryContentsWithCommits = async (
+  owner: string,
+  repo: string,
+  path: string,
+  branch: string = 'develop'
+) => {
+  const response = await githubInstance.get(`/repos/${owner}/${repo}/contents/${path}`, {
+    params: { ref: branch }
+  });
+
+  // 获取每个文件的提交信息
+  const filesWithCommits = await Promise.all(
+    response.data.map(async (file: any) => {
+      const commits = await getFileCommits(owner, repo, file.path, branch);
+      return {
+        ...file,
+        lastCommit: commits.data[0] // 取最近一次提交
+      };
+    })
+  );
+
+  return filesWithCommits;
+};
+
+export const getFileCommits = (
+  owner: string,
+  repo: string,
+  path: string,
+  branch: string
+) => {
+  return githubInstance.get(`/repos/${owner}/${repo}/commits`, {
+    params: {
+      path: path,
+      sha: branch,
+      per_page: 1 // 只获取最近一次提交
+    }
   });
 };

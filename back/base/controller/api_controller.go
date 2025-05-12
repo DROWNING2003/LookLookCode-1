@@ -19,6 +19,7 @@ func NewApiController() *ApiController {
 }
 
 func (c *ApiController) Chat(ctx *gin.Context) {
+	// 在写入任何响应之前进行所有验证
 	var request internal.RequestBody
 	if err := ctx.BindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse request body"})
@@ -34,26 +35,32 @@ func (c *ApiController) Chat(ctx *gin.Context) {
 		return
 	}
 
-	// 创建SSE响应写入器
-	writer, err := sse.NewResponseWriter(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
+	// 在创建 chat service 之前验证其可用性
 	chat, err := internal.NewChatService(ctx)
 	if err != nil {
+		fmt.Printf("err: %v\n", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create chat service"})
 		return
 	}
 
+	// 预先获取响应以确保服务可用
 	lastMessage := request.Messages[len(request.Messages)-1]
 	response, err := chat.GetResponse(ctx, request.Messages, lastMessage.Content)
 	if err != nil {
+		fmt.Printf("err: %v\n", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	defer response.Close()
+
+	// 所有验证通过后，创建SSE响应写入器
+	writer, err := sse.NewResponseWriter(ctx)
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		writer.SendError(err.Error())
+		// ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
 	// 发送初始消息
 	writer.SendStart(request.ID)
@@ -72,6 +79,7 @@ func (c *ApiController) Chat(ctx *gin.Context) {
 			break
 		}
 		if err != nil {
+			fmt.Printf("err: %v\n", err)
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get response"})
 			return
 		}
@@ -145,15 +153,16 @@ func (c *ApiController) ChatHandler(ctx *gin.Context) {
 	}
 	defer resp.Body.Close()
 
-	ctx.Writer.Header().Set("Content-Type", "text/event-stream")
-	ctx.Writer.Header().Set("Cache-Control", "no-cache")
-	ctx.Writer.Header().Set("Connection", "keep-alive")
-	ctx.Writer.WriteHeader(http.StatusOK)
 	flusher, ok := ctx.Writer.(http.Flusher)
 	if !ok {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Streaming unsupported!"})
 		return
 	}
+
+	ctx.Writer.Header().Set("Content-Type", "text/event-stream")
+	ctx.Writer.Header().Set("Cache-Control", "no-cache")
+	ctx.Writer.Header().Set("Connection", "keep-alive")
+	ctx.Writer.WriteHeader(http.StatusOK)
 
 	messageID := fmt.Sprintf("msg-%s", request.ID)
 	startMsg := fmt.Sprintf("f:{\"messageId\":\"%s\"}\n", messageID)
@@ -173,7 +182,8 @@ func (c *ApiController) ChatHandler(ctx *gin.Context) {
 			if err == io.EOF {
 				break
 			}
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error reading response from Ollama: %v", err)})
+			fmt.Fprintf(ctx.Writer, "e:{\"error\":\"%v\"}\n", err)
+			flusher.Flush()
 			return
 		}
 		part := string(buf[:n])

@@ -31,12 +31,19 @@
           <i class="fas fa-palette mr-3"></i>
           <span>主题设置</span>
         </router-link>
+        <p class="text-secondary text-sm font-mono" @click="showEnvEditor = true">
+        &copy; 2024 代码阅读. 保留所有权利
+      </p>
       </div>
     </div>
   </div>
+  <EnvEditor :isOpen="showEnvEditor" @close="showEnvEditor = false"/>
 </template>
 
 <script lang="ts" setup>
+import EnvEditor from "../components/EnvEditor.vue";
+const showEnvEditor = ref(false);
+import {ref } from "vue";
 defineProps<{
   modelValue: boolean;
 }>();

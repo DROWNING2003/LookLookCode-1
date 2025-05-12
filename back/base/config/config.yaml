@@ -1,6 +1,6 @@
 # Server Configuration
 server:
-  port: 8889
+  port: 8888
   name: "base-service"
 
 # JWT Configuration
@@ -16,14 +16,14 @@ github:
   user_info_url: "https://api.github.com/user"
   client_id: "Ov23liJpeJFTSKTMijmZ"
   client_secret: "7df5d917e928a909a4dca96a4b60d31f771b884f"
-  redirect_url: "http://localhost:9999/login"
+  redirect_url: "http://localhost:9999/"
   authorization_header: "Authorization"
   user_agent_header: "User-Agent"
   user_agent_value: "CodeReaderApp"
 
 # Consul Configuration
 consul:
-  address: "127.0.0.1:8500"
+  address: "consul:8500"
   service_name: "base-service"
   service_id: "base-1"
   service_port: 8080
