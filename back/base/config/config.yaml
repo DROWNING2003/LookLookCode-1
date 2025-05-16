@@ -16,7 +16,7 @@ github:
   user_info_url: "https://api.github.com/user"
   client_id: "Ov23liJpeJFTSKTMijmZ"
   client_secret: "7df5d917e928a909a4dca96a4b60d31f771b884f"
-  redirect_url: "http://localhost:9999/"
+  redirect_url: "http://localhost:9999/login"
   authorization_header: "Authorization"
   user_agent_header: "User-Agent"
   user_agent_value: "CodeReaderApp"

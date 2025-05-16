@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="w-full min-w-[320px] bg-background-700 z-50 h-16 flex items-center justify-around"
+    class="bg-background-700 z-50 h-full flex flex-col items-center justify-around"
   >
     <router-link
       to="/"

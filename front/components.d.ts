@@ -10,8 +10,10 @@ declare module 'vue' {
   export interface GlobalComponents {
     Banner: typeof import('./src/components/Banner.vue')['default']
     BottomNavBar: typeof import('./src/components/BottomNavBar.vue')['default']
+    BottomNavSiderBar: typeof import('./src/components/BottomNavSiderBar.vue')['default']
     BranchSelect: typeof import('./src/components/BranchSelect.vue')['default']
     CodeEdit: typeof import('./src/components/CodeEdit.vue')['default']
+    copy: typeof import('./src/components/BottomNavBar copy.vue')['default']
     DiscoverSkeletonLoader: typeof import('./src/components/DiscoverSkeletonLoader.vue')['default']
     EnvEditor: typeof import('./src/components/EnvEditor.vue')['default']
     HomeSkeletonLoader: typeof import('./src/components/HomeSkeletonLoader.vue')['default']

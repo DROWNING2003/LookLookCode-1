@@ -35,7 +35,7 @@
 }
 @layer components {
   .continer {
-    @apply relative z-20 w-full min-h-screen flex flex-col items-center justify-center text-[var(--text-primary)] text-(length:--front-size);
+    @apply relative overflow-scroll z-20 w-full h-screen flex flex-col items-center justify-center text-[var(--text-primary)] text-(length:--front-size);
   }
   .card {
     @apply border-(length:--border-width) border-(--border-color) relative z-20 p-4 w-full bg-background-700/(--background-alpha) rounded-[var(--border-radius)] text-[var(--text-primary)] text-(length:--front-size);
