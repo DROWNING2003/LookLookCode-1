@@ -2,6 +2,7 @@
   <div
     class="min-h-screen bg-gradient-to-b from-[#121212] to-[#1a1a1a] overflow-auto flex flex-col pt-14 pb-20 mx-auto w-screen"
   >
+    <RepoTopNavbar>代码预览</RepoTopNavbar>
     <!-- 主要内容区域 -->
     <main class="pt-8 pb-12 px-4 max-w-5xl mx-auto w-full">
       <!-- 仓库信息部分 -->
@@ -44,7 +45,11 @@
             v-model="currentBranch"
             :branches="branches"
           />
+          <button @click="AIAnalysis" class="p-2 rounded-2xl bg-gray-600">
+          ai 分析仓库
+          </button>
         </div>
+       
         <!-- 文件列表部分 -->
         <div class="bg-card rounded-lg overflow-hidden">
           <div class="px-4 py-2 border-b border-gray-700 bg-gray-800">
@@ -98,6 +103,8 @@
 <script lang="ts" setup>
 // Vue 核心功能导入
 import BranchSelect from "@/baseComponent/BranchSelect.vue";
+import RepoTopNavbar from "@/components/RepoTopNavbar.vue";
+import {crawlGithubFiles} from "../utils/GithubCrawl";
 import { ref, watch, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { MdPreview } from "md-editor-v3";
@@ -148,6 +155,26 @@ const files = ref<FileContent[]>([]); // 当前目录下的文件列表
 const loading = ref(true); // 加载状态
 const error = ref<string | null>(null); // 错误信息
 
+/**
+ * ai 分析
+ * 包括：获取所有文件，分析每个文件，生成报告
+ */
+function AIAnalysis() {
+  crawlGithubFiles(
+    owner,
+    repo,
+    currentPath.value,
+    ""
+  )
+    .then((response) => {
+      console.log("AI分析结果:", response);
+      // 处理分析结果
+    })
+    .catch((error) => {
+      console.error("AI分析失败:", error);
+      error.value = "AI分析失败，请稍后重试";
+    });
+}
 /**
  * 获取仓库所有相关数据
  * 包括：基本信息、README、分支列表、贡献者、目录内容、提交历史

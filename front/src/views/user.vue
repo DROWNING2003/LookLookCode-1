@@ -7,13 +7,13 @@
       <div class="absolute bottom-0 left-0 w-full p-4">
         <div class="flex flex-row items-end">
           <img :src="userStore.avatar_url" class="w-16 h-16 rounded-full border-2 border-white" />
-          <div class="ml-4 flex flex-col">
+          <div class="ml-4 flex flex-col truncate font-roboto text-base font-medium leading-6">
             <div class="flex flex-row items-center">
-              <h1 class="text-xl font-semibold">{{ userStore.name }}</h1>
-              <span class="ml-2 px-2 py-0.5 text-xs bg-blue-700 rounded-full">Pro
+              <h1 class="text-gray-100">{{ userStore.name }}</h1>
+              <span class="ml-2 px-2 py-0.5 text-xs bg-blue-700 text-gray-100 rounded-full">Pro
               </span>
             </div>
-            <p class="text-sm text-gray-300 mt-1">
+            <p class="font-roboto text-sm font-normal leading-5 text-gray-400">
               {{ userStore.bio }}
             </p>
           </div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-[#121212] to-[#1a1a1a] overflow-auto flex flex-col pt-14 pb-20 mx-auto w-screen">
+  <div class="min-h-screen bg-gradient-to-b from-[#121212] to-[#1a1a1a] overflow-auto flex flex-col pt-14 pb-20 mx-auto w-full">
   
       <!-- header&banner -->
       <Banner :banners="[
@@ -35,7 +35,7 @@
       </div>  
 
       <!-- 仓库列表 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 px-4">
         <RepoCard v-for="repo in repos" :key="repo.id" :repo="repo" />
       </div>
 

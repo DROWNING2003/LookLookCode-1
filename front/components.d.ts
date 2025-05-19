@@ -20,6 +20,7 @@ declare module 'vue' {
     PullToRefresh: typeof import('./src/components/PullToRefresh.vue')['default']
     RepoCard: typeof import('./src/components/RepoCard.vue')['default']
     RepoList: typeof import('./src/components/RepoList.vue')['default']
+    RepoTopNavbar: typeof import('./src/components/RepoTopNavbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SideBar: typeof import('./src/components/SideBar.vue')['default']

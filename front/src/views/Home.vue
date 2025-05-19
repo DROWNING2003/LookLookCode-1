@@ -5,11 +5,11 @@
   </background> -->
   <div class="z-20 w-screen h-screen hidden md:block">
     <div class="flex flex-row overflow-hidden w-full h-full">
-      <div class="w-1/3 overflow-hidden">
+      <div class="w-[256px] overflow-hidden">
         <BottomNavSiderBar  />
       </div>
       
-      <div class="w-2/3 flex flex-col">
+      <div class="flex-1 flex flex-col overflow-auto">
         <TopNavBar
           @search="handleSearch"
           @more="
@@ -17,10 +17,10 @@
               // showToast('More clicked');
             }
           "
-          class="fixed top-0"
+          class="fixed top-0 w-full"
           :title="pageTitle"
         />
-        <div class="flex-1 overflow-auto">
+        <div class="">
         <Suspense>
           <template #default>
             <PullToRefresh :onRefresh="handleRefresh" class="h-full">
@@ -36,7 +36,7 @@
     </div>
   </div>
 
-  <div class="continer md:hidden">
+  <div class="md:hidden flex-1 flex flex-col overflow-auto">
     <TopNavBar
       @search="handleSearch"
       @more="
@@ -50,7 +50,7 @@
     <Suspense>
       <template #default>
         <PullToRefresh :onRefresh="handleRefresh" class="h-full">
-          <RouterView class="overflow-auto" />
+          <RouterView />
         </PullToRefresh>
       </template>
       <template #fallback>

@@ -264,6 +264,7 @@ export const getRepositoryCommits = (owner: string, repo: string, params?: { per
 };
 
 /**
+ * wner, repo, path, branch
  * 获取仓库的文件列表
  * @param owner 仓库所有者
  * @param repo 仓库名称
@@ -343,6 +344,7 @@ export const getRepositoryFile= (owner: string, repo: string, branch: string, re
     return response.data;
   });
 };
+
 
 /**
  * 获取仓库文件提交信息
