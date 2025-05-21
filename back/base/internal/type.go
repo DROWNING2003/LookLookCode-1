@@ -9,6 +9,10 @@ type RequestBody struct {
 	ID       string     `json:"id"`
 	Messages []Messages `json:"messages"`
 }
+
+type RequestBodyAna struct {
+}
+
 type Messages struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`

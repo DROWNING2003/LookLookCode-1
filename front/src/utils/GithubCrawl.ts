@@ -19,14 +19,14 @@ import { Base64 } from "js-base64";
 //   [filePath: string]: string;
 // }
 
-interface CrawlStats {
-  downloadedCount: number;
-  skippedCount: number;
-  skippedFiles: Array<[string, number]>;
-  basePath?: string;
-  includePatterns?: Set<string>;
-  excludePatterns?: Set<string>;
-}
+// interface CrawlStats {
+//   downloadedCount: number;
+//   skippedCount: number;
+//   skippedFiles: Array<[string, number]>;
+//   basePath?: string;
+//   includePatterns?: Set<string>;
+//   excludePatterns?: Set<string>;
+// }
 
 interface CrawlOptions {
   token?: string;
@@ -84,21 +84,60 @@ export async function crawlGithubFiles(
 
   console.log(owner, repo, branch, targetPath);
 
+  // 并发控制参数
+  const MAX_CONCURRENT_REQUESTS = 5;
+  let currentRequests = 0;
+  const requestQueue: (() => Promise<void>)[] = [];
+
+  // 并发控制函数
+  const executeWithConcurrencyControl = async (fn: () => Promise<void>) => {
+    if (currentRequests >= MAX_CONCURRENT_REQUESTS) {
+      return new Promise<void>((resolve) => {
+        requestQueue.push(async () => {
+          await fn();
+          resolve();
+        });
+      });
+    }
+
+    currentRequests++;
+    try {
+      await fn();
+    } finally {
+      currentRequests--;
+      if (requestQueue.length > 0) {
+        const nextRequest = requestQueue.shift();
+        if (nextRequest) {
+          executeWithConcurrencyControl(nextRequest);
+        }
+      }
+    }
+  };
+
+  // 处理单个文件内容
+  const fetchFileContent = async (item: GithubContentItem, relativePath: string) => {
+    try {
+      const response = await getRepositoryContents(owner, repo, item.path, "");
+      const content = <FileContent>response.data;
+      if (content !== null) {
+        files[relativePath] = Base64.decode(<string>content.content);
+      }
+    } catch (error) {
+      console.error(`Error fetching file ${item.path}:`, error);
+    }
+  };
+
   // 递归获取内容
   const fetchContents = async (currentPath: string): Promise<void> => {
     try {
-      const response = await getRepositoryContents(
-        owner,
-        repo,
-        currentPath,
-        branch
-      );
+      const response = await getRepositoryContents(owner, repo, currentPath, branch);
+      const filePromises: Promise<void>[] = [];
 
       for (const item of response.data) {
-        const relativePath =
-          useRelativePaths && targetPath
-            ? item.path.replace(`${targetPath}/`, "")
-            : item.path;
+        const relativePath = useRelativePaths && targetPath
+          ? item.path.replace(`${targetPath}/`, "")
+          : item.path;
+
         // 文件过滤
         if (!matchPatterns(relativePath, includePatterns, excludePatterns)) {
           console.log("过滤的文件", relativePath);
@@ -106,43 +145,26 @@ export async function crawlGithubFiles(
         }
 
         // 大小检查
-        // const fileSize = item.size || 0;
-        // if (fileSize > maxFileSize) {
-        //   skippedFiles.push([relativePath, fileSize]);
-        //   continue;
-        // }
+        const fileSize = item.size || 0;
+        if (fileSize > maxFileSize) {
+          skippedFiles.push([relativePath, fileSize]);
+          continue;
+        }
 
         if (item.type === "dir") {
-            console.log("文件夹",item.path);
-          await fetchContents(item.path); // 递归处理目录
-          
-          continue;
-         
-        }else{
-            console.log("文件",item.path);
-        }
-       
-
-        // 获取文件内容
-        const response = await getRepositoryContents(
-          owner,
-          repo,
-          item.path,
-          ""
-        );
-        console.log(response);
-        
-        const content = <FileContent>response.data;
-        // console.log("文件内容:", content);
-        // console.log(Base64.decode(<string>content.content));
-        
-        if (content !== null) {
-          files[relativePath] = Base64.decode(<string>content.content);
+          console.log("文件夹", item.path);
+          filePromises.push(fetchContents(item.path));
+        } else {
+          console.log("文件", item.path);
+          filePromises.push(
+            executeWithConcurrencyControl(() => fetchFileContent(item, relativePath))
+          );
         }
       }
+
+      await Promise.all(filePromises);
     } catch (error) {
-        console.log(error);
-        
+      console.error(`Error processing directory ${currentPath}:`, error);
     }
   };
 

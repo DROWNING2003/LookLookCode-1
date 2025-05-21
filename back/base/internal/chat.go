@@ -17,7 +17,6 @@ type ChatService struct {
 func NewChatService(ctx context.Context) (*ChatService, error) {
 	chatModel := createOllamaChatModel(ctx)
 	// todoTools := []tool.BaseTool{}
-
 	// ragent, err := react.NewAgent(ctx, &react.AgentConfig{
 	// 	Model: chatModel,
 	// 	// ToolsConfig: compose.ToolsNodeConfig{

@@ -2,10 +2,12 @@ package controller
 
 import (
 	"base/internal"
+	"base/internal/node"
 	"base/internal/sse"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/cloudwego/eino/schema"
 	"io"
 	"net/http"
 
@@ -213,4 +215,47 @@ func (c *ApiController) ChatHandler(ctx *gin.Context) {
 	finishDataBytes, _ := json.Marshal(finishData)
 	fmt.Fprintf(ctx.Writer, "d:%s\n", string(finishDataBytes))
 	flusher.Flush()
+}
+
+func (c *ApiController) Analisy(ctx *gin.Context) {
+	// 在写入任何响应之前进行所有验证
+	var request node.PrepInput
+	if err := ctx.BindJSON(&request); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse request body"})
+		return
+	}
+
+	//if len(request.Messages) == 0 {
+	//	ctx.JSON(http.StatusBadRequest, gin.H{"error": "No messages provided"})
+	//	return
+	//}
+	//if request.ID == "" {
+	//	ctx.JSON(http.StatusBadRequest, gin.H{"error": "Missing request ID"})
+	//	return
+	//}
+
+	// 创建Specialist实例
+	r, err := node.NewIdentifyAbstractionsNode(ctx)
+
+	// 验证返回值
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Missing request ID"})
+		return
+	}
+	//prepInput := node.PrepInput{
+	//	Files: map[string]string{
+	//		"python.py": "print('hello')",
+	//	},
+	//	Project_name: "ptrts",
+	//	Language:     "中文",
+	//}
+	invoke, err := r.Invoke(ctx, &schema.Message{
+		Extra: map[string]any{
+			"PrepInput": request,
+		},
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+	ctx.JSON(http.StatusOK, gin.H{"response": invoke})
 }

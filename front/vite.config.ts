@@ -12,7 +12,7 @@ import path from 'path'
 
 export default defineConfig({
   server:{
-    port:8081
+    port:9999
   },
   plugins: [vue(),tailwindcss(),Components({
     dts: true,

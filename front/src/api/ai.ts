@@ -2,6 +2,7 @@ import axios, { type AxiosInstance } from "axios";
 import { streamText } from "ai";
 import { myProvider } from "../lib/providers";
 import { systemPrompt } from "../lib/prompts";
+import { ollama } from "ollama-ai-provider";
 
 // 创建 axios 实例
 const OllamaInstance: AxiosInstance = axios.create({
@@ -32,4 +33,11 @@ export const qwenAPI = async (messages: any[]) => {
     console.error("Chat API Error:", error);
     throw error;
   }
+};
+
+//分析
+export const ana = (file:any) => {
+  return OllamaInstance.post("/ana",{
+    files:file
+  });
 };

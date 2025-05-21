@@ -105,7 +105,7 @@
 import BranchSelect from "@/baseComponent/BranchSelect.vue";
 import RepoTopNavbar from "@/components/RepoTopNavbar.vue";
 import {crawlGithubFiles} from "../utils/GithubCrawl";
-import { ref, watch, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { MdPreview } from "md-editor-v3";
 import "md-editor-v3/lib/preview.css";
@@ -123,6 +123,9 @@ import {
   type FileContent,
   // type Commit,
 } from "../api/repo";
+import {
+  ana
+} from "../api/ai";
 
 // 路由参数获取
 const route = useRoute();
@@ -168,6 +171,7 @@ function AIAnalysis() {
   )
     .then((response) => {
       console.log("AI分析结果:", response);
+      ana(response.files)
       // 处理分析结果
     })
     .catch((error) => {
